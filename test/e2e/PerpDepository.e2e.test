@@ -1,0 +1,65 @@
+import {expect} from "chai";
+import { Contract } from "ethers";
+import { ethers, upgrades } from "hardhat";
+import { ERC20, PerpDepository, UXDController } from "../../typechain";
+
+describe("PerpDepository", async () => {
+    let depository: Contract;
+    const ethAmount = ethers.utils.parseEther("0.001");
+    const clearingHouse = "0x2546BcD3c84621e976D8185a91A922aE77ECEc30";
+    const vaultAddress = "0xbDA5747bFD65F08deb54cb465eB87D40e51B197E";
+    const marketRegistry = "0xdD2FD4581271e230360230F9337D5c0430Bf44C0";
+    const perpUSDC = "0x3e22e37Cb472c872B5dE121134cFD1B57Ef06560";
+    const perpWETH9 = "0x4200000000000000000000000000000000000006";
+    const market = "0x60A233b9b94c67e94e0a269429Fb40004D4BA494";
+    const softCap = ethers.utils.parseEther("1000");
+    const admin = (await ethers.getSigners())[0];
+    const router = admin.address;
+    const usdcDecimals = 6;
+    let weth: ERC20;
+    let usdc: ERC20;
+
+    beforeEach(async ()=> {
+        const ERC20 = await ethers.getContractFactory("TestERC20");
+        const usdcAmount = ethers.utils.parseUnits("1", usdcDecimals);
+
+        weth = ERC20.attach(perpWETH9);
+        usdc = ERC20.attach(perpUSDC);
+
+        // deploy initial contract
+        const PerpDepository = await ethers.getContractFactory("TestPerpDepository");
+        console.log("about to deploy depository")
+        depository = await PerpDepository.deploy();
+        await depository.deployed();
+        console.log('about to initialize')
+        const initTx = await depository.initialize(
+            vaultAddress,
+            clearingHouse,
+            marketRegistry,
+            market,
+            perpWETH9,
+            perpUSDC,
+            router
+        );
+        await initTx.wait();
+
+
+        console.log("PerpDepository deployed to ", depository.address)
+
+        await(await depository.setRedeemableSoftCap(softCap)).wait();
+        console.log('redeemable softcap set')
+
+        await (await usdc.approve(depository.address, usdcAmount)).wait();
+        console.log('usdc approved')
+
+        const depositTx = await depository.depositInsurance(usdcAmount, admin.address);
+        console.log('depositTx = ', depositTx);
+        console.log('insurance deposited');
+    });
+
+    it("Can check version", async () => {
+        await (await weth.approve(depository.address, ethAmount)).wait();
+        await (await depository.depositCollateral(ethAmount)).wait()
+        console.log("Collateral deposited")
+    });
+});
