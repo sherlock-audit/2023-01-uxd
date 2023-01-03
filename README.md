@@ -6,8 +6,8 @@
 
 # Resources
 
-- [UXD Protocol General documentation (Gitbook)](https://app.gitbook.com/o/-MjEqYdkIaIdVxtVi5Ak/s/-Mj8VWsobdvjhMutae2g/)
-- [UXD Protocol Ethereum documentation (Gitbook)](https://app.gitbook.com/o/-MjEqYdkIaIdVxtVi5Ak/s/1E6zuIkkA2VyjNzzq1dR/)
+- [UXD Protocol General documentation (Gitbook)](https://docs.uxd.fi/uxdprotocol/)
+- [UXD Protocol Ethereum documentation (Gitbook)](https://docs.uxd.fi/uxdprogram-ethereum/)
 - [UXDProtocol Github](https://github.com/UXDProtocol)
 - [UXD EVM repository @a3ed1e0](https://github.com/UXDProtocol/uxd-evm/tree/sherlock-audit)
 
